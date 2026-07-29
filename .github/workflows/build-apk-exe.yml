@@ -1,4 +1,4 @@
-name: Build Mercury AI APK and EXE - 100% Online sem PC
+name: Build Mercury AI APK and EXE - 100% Online sem PC - FIX
 on:
   push:
     branches: [main]
@@ -20,9 +20,14 @@ jobs:
         uses: android-actions/setup-android@v3
       - name: Install dependencies
         run: npm install
-      - name: Expo prebuild Android
-        run: npx expo prebuild --platform android --no-install || true
-      - name: Build APK
+      - name: Expo prebuild Android (gera pasta android)
+        run: |
+          npx expo prebuild --platform android
+          ls -la
+          ls -la android || echo "android não criado, tentando de novo"
+          npx expo prebuild --platform android --clean || true
+          ls -la android
+      - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
@@ -40,16 +45,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install Rust
+      - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
-      - name: Install deps
+      - name: Install Node deps
         run: npm install
       - name: Install Tauri CLI
-        run: cargo install tauri-cli --locked || true
-      - name: Build EXE
-        run: cargo tauri build
-      - name: Upload EXE MSI
-        uses: actions/upload-artifact@v4
-        with:
-          name: MercuryAI-EXE-8MB
-          path: src-tauri/target/release/bundle/msi/*.msi
+        run: cargo install tauri-cli --locked
+      - name: Init Tauri project (cria tauri.conf.json)
+        run: |
+          npx @tauri/cli init --ci --app-name "Mercury AI" --window-title "Mercury AI" --dist-dir ../dist --dev-path http://localhost:1420 --beforeDevCommand "" --beforeBuildCommand ""
+        continue-on-error: true
+      - name: Init Tauri fallback
+        run: |
+          if (!(Test-Path src-tauri)) { 
+            mkdir src-tauri
+            echo 
