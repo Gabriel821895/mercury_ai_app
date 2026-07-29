@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Mercury AI",
+    "slug": "venda-bot-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/logo-primary.png",
+    "splash": {
+      "image": "./assets/logo-primary.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.mercuryai.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo-primary.png",
+        "backgroundColor": "#0f172a"
+      }
+    },
+    "web": {
+      "favicon": "./assets/logo-primary.png"
+    }
+  }
+}
