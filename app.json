@@ -8,7 +8,7 @@
     "splash": {
       "image": "./assets/logo-primary.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0f172a"
+      "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -17,11 +17,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.mercuryai.app",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/logo-primary.png",
-        "backgroundColor": "#0f172a"
-      }
+      "package": "com.mercuryai.app"
     },
     "web": {
       "favicon": "./assets/logo-primary.png"
