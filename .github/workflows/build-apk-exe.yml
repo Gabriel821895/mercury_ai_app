@@ -1,4 +1,4 @@
-name: Build Mercury AI APK and EXE - FIX 2
+name: Build Mercury AI APK and EXE - 100% Online
 on:
   push:
     branches: [main]
@@ -18,18 +18,19 @@ jobs:
           java-version: '17'
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-      - name: Install dependencies + splash-screen
+      - name: Install dependencies
+        run: npm install
+      - name: Expo prebuild Android (fix splashscreen)
         run: |
-          npm install
-          npm install expo-splash-screen
-      - name: Expo prebuild Android
-        run: npx expo prebuild --platform android --clean
-      - name: Build APK
+          npx expo install expo-splash-screen
+          npx expo prebuild --platform android --no-install
+          ls -la android/app/src/main/res/values/ || true
+      - name: Build APK with Gradle
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease
-      - name: Upload APK
+          ./gradlew assembleRelease --stacktrace
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MercuryAI-APK-100-Real
@@ -42,17 +43,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install Rust stable
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       - name: Install Node deps
         run: npm install
-      - name: Install Tauri CLI
+      - name: Install Tauri CLI via Cargo
         run: cargo install tauri-cli --locked
-      - name: Init Tauri
-        run: npx @tauri/cli init --ci --app-name "Mercury AI" --window-title "Mercury AI"
+      - name: Init Tauri if missing
+        run: |
+          if (-not (Test-Path src-tauri/tauri.conf.json)) {
+            cargo tauri init --ci --app-name "Mercury AI" --window-title "Mercury AI"
+          }
+        shell: pwsh
       - name: Build EXE
-        run: npx @tauri/cli build
-      - name: Upload EXE MSI
+        run: cargo tauri build --verbose
+      - name: Upload EXE
         uses: actions/upload-artifact@v4
         with:
           name: MercuryAI-EXE-8MB
