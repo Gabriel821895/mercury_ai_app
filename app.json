@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/logo-primary.png",
+    "splash": {
+      "image": "./assets/logo-primary.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -12,7 +17,11 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.mercuryai.app"
+      "package": "com.mercuryai.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo-primary.png",
+        "backgroundColor": "#FFFFFF"
+      }
     },
     "web": {
       "favicon": "./assets/logo-primary.png"
