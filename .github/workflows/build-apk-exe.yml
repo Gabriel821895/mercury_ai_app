@@ -20,7 +20,7 @@ jobs:
         uses: android-actions/setup-android@v3
       - name: Install dependencies
         run: npm install
-      - name: Expo prebuild Android (fix splashscreen)
+      - name: Expo prebuild Android
         run: |
           npx expo install expo-splash-screen
           npx expo prebuild --platform android --no-install
@@ -43,22 +43,36 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@stable
       - name: Install Node deps
         run: npm install
-      - name: Install Tauri CLI via Cargo
-        run: cargo install tauri-cli --locked
-      - name: Init Tauri if missing
+      - name: Install Tauri CLI via Cargo (stable)
+        run: cargo install tauri-cli --version ^1.5 --locked
+      - name: Check Tauri project exists
         run: |
-          if (-not (Test-Path src-tauri/tauri.conf.json)) {
-            cargo tauri init --ci --app-name "Mercury AI" --window-title "Mercury AI"
+          dir
+          dir src-tauri || echo "src-tauri not exists, will init"
+        shell: pwsh
+      - name: Tauri Init if missing (PowerShell safe)
+        run: |
+          if (-not (Test-Path "src-tauri/tauri.conf.json")) {
+            Write-Host "Init Tauri project..."
+            cargo tauri init --ci --app-name "Mercury AI" --window-title "Mercury AI" --dist-dir "../dist" --dev-path "http://localhost:1420"
+          } else {
+            Write-Host "src-tauri/tauri.conf.json already exists"
           }
         shell: pwsh
-      - name: Build EXE
-        run: cargo tauri build --verbose
-      - name: Upload EXE
+      - name: Build EXE with Tauri
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: ./
+          args: --verbose
+      - name: Upload EXE MSI
         uses: actions/upload-artifact@v4
         with:
           name: MercuryAI-EXE-8MB
-          path: src-tauri/target/release/bundle/msi/*.msi
+          path: |
+            src-tauri/target/release/bundle/msi/*.msi
+            src-tauri/target/release/bundle/exe/*.exe
